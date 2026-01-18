@@ -1,5 +1,6 @@
 # meta developer: @znxiw
 # scope: hikka_only
+# meta version: 2.5.2
 # красивых выводов не будет. разраб в запое
 # лицензия чисто по феншую
 # ебите эти сурсы как хотите. мне вообще похую
@@ -8,8 +9,6 @@ from telethon import events
 from telethon.tl.types import User
 from .. import loader, utils
 import logging
-
-__version__ = (2, 5, 2)
 
 logger = logging.getLogger(__name__)
 

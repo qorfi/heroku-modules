@@ -1,12 +1,10 @@
 # meta developer: @znxiw
 # scope: hikka_only
 # requires: emoji
-
+# meta version: 1.1.1
 import random
 import emoji
 from .. import loader, utils
-
-__version__ = (1, 1, 1)
 
 @loader.tds
 class SinksMod(loader.Module):

@@ -1,12 +1,11 @@
 # meta developer: @znxiw
+# meta version: 1.0.4
 # красивых выводов не будет. разраб в запое
 # лицензия чисто по феншую
 # ебите эти сурсы как хотите. мне вообще похую
 
 import aiohttp
 from .. import loader, utils
-
-__version__ = (1, 0, 4)
 
 @loader.tds
 class DolisMod(loader.Module):

@@ -9,6 +9,7 @@
 #---------------------!!------------!!---------------------#
 # meta developer: @znxiw
 # Requires: hikkatl
+# meta version: 1.4.9
 import random
 import re
 import aiohttp
@@ -17,8 +18,6 @@ from telethon.tl.functions.contacts import ImportContactsRequest, DeleteContacts
 from telethon.tl.types import InputPhoneContact, PeerUser, User
 from telethon.errors import FloodWaitError, RPCError
 from .. import loader, utils
-
-__version__ = (1, 4, 9)
 
 class NullLogger:
     def exception(self, *args, **kwargs):

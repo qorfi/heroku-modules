@@ -10,15 +10,13 @@
 # meta developer: @znxiw
 # meta banner: https://x0.at/ep0r.jpg
 # requires: telegram-stars-rates
-
+# meta version: 2.0.0
 import asyncio
 import aiohttp
 import time
 from datetime import datetime
 from .. import loader, utils
 from telegram_stars_rates import get_stars_rate
-
-__version__ = (2, 0, 0)
 
 @loader.tds
 class Pingo(loader.Module):

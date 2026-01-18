@@ -1,10 +1,9 @@
 # meta developer: GXDEE.t.me
 # scope: hikka_only
+# meta version: 1.2.0
 
 from .. import loader, utils
 from datetime import datetime, timezone, timedelta
-
-__version__ = (1, 2)
 
 @loader.tds
 class Midex(loader.Module):

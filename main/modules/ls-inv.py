@@ -1,13 +1,12 @@
 # meta developer: Lolix_God
 # scope: hikka_only
 # scope: hikka_min 1.3.0
+# meta version: 1.1.0
 import asyncio
 import logging
 import random
 from telethon import errors
 from .. import loader, utils
-
-__version__ = (1, 1, 0)
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
 # meta developer: @znxiw
 # scope: hikka_only
 # requires: python-docx pypdf openpyxl
+# meta version: 2.1.1
 
 import io
 import html
@@ -9,8 +10,6 @@ import re
 import logging
 from telethon.tl.types import MessageMediaDocument
 from .. import loader, utils
-
-__version__ = (2, 1, 1)
 
 try:
     import docx

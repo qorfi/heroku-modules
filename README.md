@@ -8,7 +8,7 @@
 [![Heroku](https://img.shields.io/badge/Heroku-black?style=for-the-badge&logo=heroku)](https://github.com/coddrago/Heroku)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-**Custom scripts collection for [Heroku](https://github.com/coddrago/Heroku)**
+**Modules for [Heroku](https://github.com/coddrago/Heroku)**
 
 </div>
 
@@ -40,7 +40,7 @@ Installation is performed via a direct link.
 2. Click the **"Raw"** button to get the direct link.
 3. Send the following command in any Telegram chat:
 
-``.dlm https://raw.githubusercontent.com/qorfi/heroku-modules/refs/heads/main/main/modules/{название-модуля}.py``
+``.dlm https://raw.githubusercontent.com/qorfi/heroku-modules/main/main/modules/{название-модуля}.py``
 
 *If the module is valid, the bot will respond with a success message.*
 
@@ -56,7 +56,7 @@ Installation is performed via a direct link.
 
 Found a bug? Need support?
 
-* **Telegram:** [@znxiw](https://www.google.com/search?q=https://t.me/znxiw)
+* **Telegram:** [@znxiw](https://t.me/znxiw)
 * **Email:** qorfi@atomicmail.io
 
 ---

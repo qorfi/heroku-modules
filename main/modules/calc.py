@@ -1,12 +1,11 @@
 # meta developer: @znxiw
+# meta version: 1.0.0
 # да я вообще не вкуриваю что тут за хуйня
 # бухой написал
 
 import ast
 import operator
 from .. import loader, utils
-
-__version__ = (1, 0, 0)
 
 _OP_MAP = {
     ast.Add: operator.add,
