@@ -34,16 +34,13 @@ Every script is written with `Telethon` asynchrony in mind, ensuring maximum per
 ---
 
 ## 📥 Installation
-
 Installation is performed via a direct link. 
 
 1. Open the desired `.py` file in this repository.
 2. Click the **"Raw"** button to get the direct link.
 3. Send the following command in any Telegram chat:
 
-```bash
-.load [https://raw.githubusercontent.com/qorfi/heroku-modules/master/ModuleName.py](https://raw.githubusercontent.com/qorfi/heroku-modules/master/ModuleName.py)
-```
+``.dlm https://raw.githubusercontent.com/qorfi/heroku-modules/refs/heads/main/main/modules/{название-модуля}.py``
 
 *If the module is valid, the bot will respond with a success message.*
 
