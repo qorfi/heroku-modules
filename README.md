@@ -1,7 +1,7 @@
 # ⚡️ Qorfi Heroku Modules
 <div align="center">
   
-![Banner](./assets/sss.jpg)
+![Banner](./assets/sss.png)
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-yellow?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Telethon](https://img.shields.io/badge/Lib-Telethon-blue?style=for-the-badge&logo=telegram)](https://docs.telethon.dev/)
