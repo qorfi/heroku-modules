@@ -229,5 +229,5 @@ crontab -e
 ---
 <div align="center">
 
-![Banner](./assets/sss.png)
+![Banner](https://github.com/qorfi/heroku-modules/blob/main/assets/sss.png)
 </div>
