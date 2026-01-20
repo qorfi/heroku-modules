@@ -1,4 +1,4 @@
-# meta developer: GXDEE.t.me
+# meta developer: @znxiw
 # scope: hikka_only
 # meta version: 1.2.0
 

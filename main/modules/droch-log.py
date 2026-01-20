@@ -1,9 +1,9 @@
 # meta developer: @znxiw
+# scope: hikka_only
+# meta version: 1.0.0
 
 from .. import loader, utils
 import asyncio
-
-__version__ = (1, 0, 0)
 
 @loader.tds
 class JengoMod(loader.Module):

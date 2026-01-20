@@ -99,7 +99,7 @@ class КукуляторMod(loader.Module):
             else:
                 formatted_answer = str(answer)
                 
-            final_answer = f"<b>{question}=</b><code>{formatted_answer}</code>"
+            final_answer = f"<b>{question} = </b> <code>{formatted_answer}</code>"
         
         except Exception as e:
             error_message = str(e).splitlines()[0] if str(e) else "Неизвестная ошибка вычисления"
