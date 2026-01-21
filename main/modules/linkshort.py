@@ -1,157 +1,135 @@
 # meta developer: @znxiw
-# meta version: 1.2.0
-# красивых выводов не будет. разраб в запое
-# лицензия чисто по феншую
-# ебите эти сурсы как хотите. мне вообще похую
+# # scope: hikka_only
+# scope: hikka_min 3.0.0
+# meta version: 1.3.1
 
-import aiohttp
+import logging
+import requests
+from io import BytesIO
 from .. import loader, utils
 
-@loader.tds
-class DolisMod(loader.Module):
-    """
-    Комбайн для ссылок: сокращатель, дешифратор, QR-коды и Webshot (скриншоты сайтов).
-    """
+logger = logging.getLogger(__name__)
 
+@loader.tds
+class AdvancedLinkMod(loader.Module):
+    """
+    Модуль для работы со ссылками, QR-кодами и скриншотами сайтов.
+    """
     strings = {
-        "name": "Dolis",
-        "clck_doc": "Сократить ссылку через clck.ru.\nИспользование: <code>.ls <ссылка></code>",
-        "unclck_doc": "Расшифровать (развернуть) сокращенную ссылку.\nИспользование: <code>.unls <ссылка></code>",
-        "qr_doc": "Создать QR-код из ссылки или текста.\nИспользование: <code>.qr <текст/ссылка></code>",
-        "webshot_doc": "Сделать скриншот сайта.\nИспользование: <code>.webshot <ссылка></code>",
-        
-        "no_args": "<blockquote><b>Ошибка:</b> Не указана ссылка или текст.</blockquote>",
-        "invalid_url": "<blockquote><b>Ошибка:</b> Ссылка должна начинаться с <code>http://</code> или <code>https://</code>.</blockquote>",
-        "processing": "<blockquote><b>Обработка...</b></blockquote>",
-        "uploading": "<blockquote><b>Генерирую QR-код...</b></blockquote>",
-        "shooting": "<blockquote><emoji document_id=5818865084271365343>📸</emoji> <b>Делаю снимок сайта...</b>\n<i>Это может занять пару секунд.</i></blockquote>",
-        
-        "success_ls": "<blockquote><b>Сокращено:</b> <code>{short_url}</code></blockquote>",
-        "success_unls": "<blockquote><b>Расшифровано:</b>\nКороткая: <code>{short}</code></blockquote>",
-        
-        "api_error": "<blockquote><b>Ошибка API ({status}):</b> Не удалось выполнить запрос.</blockquote>",
-        "network_error": "<blockquote><emoji document_id=5116156972751651938>🖕</emoji> <b>Сетевая ошибка:</b> <code>{error}</code></blockquote>"
+        "name": "AdvancedLinkMod",
+        "processing": "<b>🔄 Обрабатываю...</b>",
+        "error": "<b>❌ Ошибка:</b> {}",
+        "no_args": "<b>❌ Нет аргументов. Укажи ссылку или текст.</b>",
+        "shot_caption": "📸 <b>Снимок страницы:</b> {}",
+        "unshorten_result": "🔗 <b>Расшифрованная ссылка:</b>\n<code>{}</code>"
     }
 
-    CLCK_API_URL = "https://clck.ru/--?url={}"
-    QR_API_URL = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={}"
-    WEBSHOT_API_URL = "https://mini.s-shot.ru/1280x720/JPEG/1280/Z100/?{}"
-
     async def client_ready(self, client, db):
-        self._client = client
-        
-    @loader.command(ru_doc=lambda self: self.strings("clck_doc"))
-    async def lscmd(self, message):
-        """<ссылка> - сократить ссылку"""
-        args = utils.get_args_raw(message).strip()
-        
+        self.client = client
+
+    async def mkqrcmd(self, message):
+        """<текст/ссылка> - Создать QR-код (отправляет как фото, без текста)"""
+        args = utils.get_args_raw(message)
         if not args:
-            return await utils.answer(message, self.strings("no_args"), parse_mode="HTML")
-
-        if not args.startswith(("http://", "https://")):
-            return await utils.answer(message, self.strings("invalid_url"), parse_mode="HTML")
-
-        await utils.answer(message, self.strings("processing"), parse_mode="HTML")
+            reply = await message.get_reply_message()
+            if reply and reply.text:
+                args = reply.text
+            else:
+                await utils.answer(message, self.strings("no_args"))
+                return
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(self.CLCK_API_URL.format(args)) as response:
-                    if response.status != 200:
-                        return await utils.answer(
-                            message, 
-                            self.strings("api_error").format(status=response.status), 
-                            parse_mode="HTML"
-                        )
-                    shortened_url = (await response.text()).strip()
-
-        except Exception as e:
-            return await utils.answer(message, self.strings("network_error").format(error=str(e)), parse_mode="HTML")
-
-        if shortened_url:
-            await utils.answer(message, self.strings("success_ls").format(short_url=shortened_url), parse_mode="HTML")
-        else:
-            await utils.answer(message, self.strings("api_error").format(status="Empty Response"), parse_mode="HTML")
-
-    @loader.command(ru_doc=lambda self: self.strings("unclck_doc"))
-    async def unlscmd(self, message):
-        """<ссылка> - расшифровать ссылку"""
-        args = utils.get_args_raw(message).strip()
-
-        if not args:
-            return await utils.answer(message, self.strings("no_args"), parse_mode="HTML")
-        
-        if not args.startswith(("http://", "https://")):
-            args = "https://" + args
-
-        await utils.answer(message, self.strings("processing"), parse_mode="HTML")
-
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.head(args, allow_redirects=True) as response:
-                    real_url = str(response.url)
+            url = f"https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={requests.utils.quote(args)}"
+            response = await utils.run_sync(requests.get, url)
             
-            await utils.answer(
-                message, 
-                self.strings("success_unls").format(short=args, original=real_url), 
-                parse_mode="HTML"
+            if response.status_code != 200:
+                await utils.answer(message, self.strings("error").format("API Error"))
+                return
+
+            file = BytesIO(response.content)
+            file.name = "qr.jpg"
+
+            await message.client.send_file(
+                message.to_id,
+                file,
+                force_document=False,
+                reply_to=message.reply_to_msg_id
             )
-
-        except Exception as e:
-            return await utils.answer(message, self.strings("network_error").format(error=str(e)), parse_mode="HTML")
-
-    @loader.command(ru_doc=lambda self: self.strings("qr_doc"))
-    async def qrcmd(self, message):
-        """<текст/ссылка> - создать QR-код"""
-        args = utils.get_args_raw(message).strip()
-        
-        if not args:
-            return await utils.answer(message, self.strings("no_args"), parse_mode="HTML")
-
-        await utils.answer(message, self.strings("uploading"), parse_mode="HTML")
-        
-        qr_url = self.QR_API_URL.format(utils.escape_html(args))
-        
-        try:
-            await utils.answer(message, qr_url, parse_mode="HTML")
-        except Exception:
-            try:
-                await message.delete()
-                await message.client.send_file(message.chat_id, qr_url, caption=f"<code>{args}</code>")
-            except Exception as e:
-                await utils.answer(message, self.strings("network_error").format(error=str(e)), parse_mode="HTML")
-
-    @loader.command(ru_doc=lambda self: self.strings("webshot_doc"))
-    async def webshotcmd(self, message):
-        """<ссылка> - скриншот сайта"""
-        args = utils.get_args_raw(message).strip()
-        
-        if not args:
-            return await utils.answer(message, self.strings("no_args"), parse_mode="HTML")
             
-        if not args.startswith(("http://", "https://")):
-            args = "http://" + args
+            await message.delete()
 
-        await utils.answer(message, self.strings("shooting"), parse_mode="HTML")
-        
-        shot_url = self.WEBSHOT_API_URL.format(args)
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(shot_url) as response:
-                    if response.status == 200:
-                        content = await response.read()
-                        await message.delete()
-                        await message.client.send_file(
-                            message.chat_id, 
-                            content, 
-                            caption=f"<b>Webshot:</b> <code>{args}</code>", 
-                            parse_mode="HTML"
-                        )
-                    else:
-                        await utils.answer(
-                             message, 
-                             self.strings("api_error").format(status=response.status), 
-                             parse_mode="HTML"
-                        )
         except Exception as e:
-            await utils.answer(message, self.strings("network_error").format(error=str(e)), parse_mode="HTML")
+            await utils.answer(message, self.strings("error").format(str(e)))
+
+    async def unshortcmd(self, message):
+        """<ссылка> - Расшифровать сокращенную ссылку (работает с clck.ru и др.)"""
+        args = utils.get_args_raw(message)
+        if not args:
+            reply = await message.get_reply_message()
+            if reply and reply.text:
+                args = reply.text
+            else:
+                await utils.answer(message, self.strings("no_args"))
+                return
+
+        if not args.startswith("http"):
+            args = "https://" + args.strip()
+
+        message = await utils.answer(message, self.strings("processing"))
+
+        try:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+            
+            response = await utils.run_sync(requests.get, args, headers=headers, allow_redirects=True, timeout=10)
+            
+            final_url = response.url
+            
+            await utils.answer(message, self.strings("unshorten_result").format(final_url))
+
+        except Exception as e:
+            await utils.answer(message, self.strings("error").format(str(e)))
+
+    async def webshotcmd(self, message):
+        """<ссылка> - Сделать скриншот веб-сайта"""
+        args = utils.get_args_raw(message)
+        if not args:
+            reply = await message.get_reply_message()
+            if reply and reply.text:
+                args = reply.text
+            else:
+                await utils.answer(message, self.strings("no_args"))
+                return
+
+        if not args.startswith("http"):
+            target_url = "https://" + args.strip()
+        else:
+            target_url = args.strip()
+
+        message = await utils.answer(message, self.strings("processing"))
+
+        try:
+            api_url = f"https://image.thum.io/get/width/1200/crop/800/noanimate/{target_url}"
+            
+            response = await utils.run_sync(requests.get, api_url)
+            
+            if response.status_code != 200:
+                await utils.answer(message, self.strings("error").format("Не удалось получить изображение"))
+                return
+
+            file = BytesIO(response.content)
+            file.name = "webshot.jpg"
+
+            await message.client.send_file(
+                message.to_id,
+                file,
+                caption=self.strings("shot_caption").format(target_url),
+                force_document=False, # Сжатие включено (отправка как фото)
+                reply_to=message.reply_to_msg_id
+            )
+            
+            await message.delete()
+
+        except Exception as e:
+            await utils.answer(message, self.strings("error").format(str(e)))
